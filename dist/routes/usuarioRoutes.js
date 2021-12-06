@@ -95,4 +95,11 @@ userRoutes.put('/actualizar', autenticacion_1.validaToken, (req, res) => {
         });
     });
 });
+userRoutes.get('/informacion', autenticacion_1.validaToken, (req, res) => {
+    const usuario = req.usuario;
+    res.json({
+        ok: true,
+        usuario
+    });
+});
 exports.default = userRoutes;

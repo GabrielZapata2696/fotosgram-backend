@@ -7,12 +7,17 @@ const server_1 = __importDefault(require("./classes/server"));
 const usuarioRoutes_1 = __importDefault(require("./routes/usuarioRoutes"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const express_1 = __importDefault(require("express"));
+const postRoutes_1 = __importDefault(require("./routes/postRoutes"));
+const express_fileupload_1 = __importDefault(require("express-fileupload"));
 const server = new server_1.default;
 //middleware Body parser
 server.app.use(express_1.default.urlencoded({ extended: true }));
 server.app.use(express_1.default.json());
+//File Upload
+server.app.use(express_fileupload_1.default({ useTempFiles: true }));
 //rutas de la aplicación
 server.app.use('/user', usuarioRoutes_1.default);
+server.app.use('/post', postRoutes_1.default);
 //conexion a la base de datos mongodb
 mongoose_1.default.connect('mongodb://localhost:27017/fotosgram', (err) => {
     if (err)

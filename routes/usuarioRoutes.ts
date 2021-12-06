@@ -48,8 +48,6 @@ userRoutes.post('/login', (req: Request, res: Response) => {
 });
 
 
-
-
 //crear un usuario
 userRoutes.post('/crear', (req: Request, res: Response) => {
 
@@ -86,7 +84,6 @@ userRoutes.post('/crear', (req: Request, res: Response) => {
 
 
 //Actualizar usuario 
-
 userRoutes.put('/actualizar', validaToken, (req: any, res: Response) => {
 
     const user = {
@@ -124,6 +121,13 @@ userRoutes.put('/actualizar', validaToken, (req: any, res: Response) => {
 
 });
 
+userRoutes.get('/informacion', validaToken, (req: any, res: Response) => {
+    const usuario = req.usuario;
+    res.json({
+        ok: true,
+        usuario
+    });
+});
 
 
 export default userRoutes;
