@@ -92,29 +92,49 @@ userRoutes.put('/actualizar', validaToken, (req: any, res: Response) => {
         avatar: req.body.avatar || req.usuario.avatar
     }
 
-
-    Usuario.findByIdAndUpdate(req.usuario._id, user, { new: true }, (err, userBD) => {
-
-        if (err) throw err;
-
-        if (!userBD) {
+    Usuario.findOne({ email: req.usuario.email }, (err: any, userEmailDB: any) => {
+        if (err) {
             return res.json({
                 ok: false,
-                mensaje: 'No existe un usuario con el ID especificado'
+                mensaje: `Error: ${err.codeName}`
+            })
+        }
+        if (userEmailDB) {
+            return res.json({
+                ok: false,
+                mensaje: `Ya se encuentra registrado el email: ${req.usuario.email}`
+            });
+        } else {
+
+            Usuario.findByIdAndUpdate(req.usuario._id, user, { new: true }, (err: any, userBD) => {
+
+                if (err) {
+                    return res.json({
+                        ok: false,
+                        mensaje: `Error al actualizar: ${err.codeName}`
+                    })
+                }
+
+                if (!userBD) {
+                    return res.json({
+                        ok: false,
+                        mensaje: 'No existe un usuario con el ID especificado'
+                    });
+                }
+                const tokenUser = Token.obtenerJwtToken({
+                    _id: userBD._id,
+                    nombre: userBD.nombre,
+                    email: userBD.email,
+                    avatar: userBD.avatar
+                });
+
+                res.json({
+                    ok: true,
+                    token: tokenUser
+                });
+
             });
         }
-        const tokenUser = Token.obtenerJwtToken({
-            _id: userBD._id,
-            nombre: userBD.nombre,
-            email: userBD.email,
-            avatar: userBD.avatar
-        });
-
-        res.json({
-            ok: true,
-            token: tokenUser
-        });
-
     });
 
 

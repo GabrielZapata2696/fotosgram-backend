@@ -74,25 +74,45 @@ userRoutes.put('/actualizar', autenticacion_1.validaToken, (req, res) => {
         email: req.body.email || req.usuario.email,
         avatar: req.body.avatar || req.usuario.avatar
     };
-    usuario_model_1.Usuario.findByIdAndUpdate(req.usuario._id, user, { new: true }, (err, userBD) => {
-        if (err)
-            throw err;
-        if (!userBD) {
+    usuario_model_1.Usuario.findOne({ email: req.usuario.email }, (err, userEmailDB) => {
+        if (err) {
             return res.json({
                 ok: false,
-                mensaje: 'No existe un usuario con el ID especificado'
+                mensaje: `Error: ${err.codeName}`
             });
         }
-        const tokenUser = token_1.default.obtenerJwtToken({
-            _id: userBD._id,
-            nombre: userBD.nombre,
-            email: userBD.email,
-            avatar: userBD.avatar
-        });
-        res.json({
-            ok: true,
-            token: tokenUser
-        });
+        if (userEmailDB) {
+            return res.json({
+                ok: false,
+                mensaje: `Ya se encuentra registrado el email: ${req.usuario.email}`
+            });
+        }
+        else {
+            usuario_model_1.Usuario.findByIdAndUpdate(req.usuario._id, user, { new: true }, (err, userBD) => {
+                if (err) {
+                    return res.json({
+                        ok: false,
+                        mensaje: `Error al actualizar: ${err.codeName}`
+                    });
+                }
+                if (!userBD) {
+                    return res.json({
+                        ok: false,
+                        mensaje: 'No existe un usuario con el ID especificado'
+                    });
+                }
+                const tokenUser = token_1.default.obtenerJwtToken({
+                    _id: userBD._id,
+                    nombre: userBD.nombre,
+                    email: userBD.email,
+                    avatar: userBD.avatar
+                });
+                res.json({
+                    ok: true,
+                    token: tokenUser
+                });
+            });
+        }
     });
 });
 userRoutes.get('/informacion', autenticacion_1.validaToken, (req, res) => {
