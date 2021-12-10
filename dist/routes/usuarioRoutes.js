@@ -82,37 +82,37 @@ userRoutes.put('/actualizar', autenticacion_1.validaToken, (req, res) => {
             });
         }
         if (userEmailDB) {
-            return res.json({
-                ok: false,
-                mensaje: `Ya se encuentra registrado el email: ${req.usuario.email}`
-            });
-        }
-        else {
-            usuario_model_1.Usuario.findByIdAndUpdate(req.usuario._id, user, { new: true }, (err, userBD) => {
-                if (err) {
-                    return res.json({
-                        ok: false,
-                        mensaje: `Error al actualizar: ${err.codeName}`
-                    });
-                }
-                if (!userBD) {
-                    return res.json({
-                        ok: false,
-                        mensaje: 'No existe un usuario con el ID especificado'
-                    });
-                }
-                const tokenUser = token_1.default.obtenerJwtToken({
-                    _id: userBD._id,
-                    nombre: userBD.nombre,
-                    email: userBD.email,
-                    avatar: userBD.avatar
+            if (userEmailDB._id.toString() !== req.body._id.toString()) {
+                return res.json({
+                    ok: false,
+                    mensaje: `Ya se encuentra registrado el email: ${req.usuario.email}`
                 });
-                res.json({
-                    ok: true,
-                    token: tokenUser
-                });
-            });
+            }
         }
+        usuario_model_1.Usuario.findByIdAndUpdate(req.usuario._id, user, { new: true }, (err, userBD) => {
+            if (err) {
+                return res.json({
+                    ok: false,
+                    mensaje: `Error al actualizar: ${err.codeName}`
+                });
+            }
+            if (!userBD) {
+                return res.json({
+                    ok: false,
+                    mensaje: 'No existe un usuario con el ID especificado'
+                });
+            }
+            const tokenUser = token_1.default.obtenerJwtToken({
+                _id: userBD._id,
+                nombre: userBD.nombre,
+                email: userBD.email,
+                avatar: userBD.avatar
+            });
+            res.json({
+                ok: true,
+                token: tokenUser
+            });
+        });
     });
 });
 userRoutes.get('/informacion', autenticacion_1.validaToken, (req, res) => {
