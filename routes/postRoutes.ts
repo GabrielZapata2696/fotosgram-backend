@@ -33,6 +33,32 @@ postRoutes.get('/', async (req: any, res: Response) => {
 
 });
 
+//obtener POST paginado por usuario
+postRoutes.get('/obtener', async (req: any, res: Response) => {
+
+    let id = req.query.usuario || null;
+    let pagina = +req.query.pagina || 1;
+    let skip = pagina - 1;
+    skip = skip * 10;
+
+    const post = await Post.find({ usuario: id })
+        .sort({ _id: -1 })
+        .skip(skip)
+        .limit(10)
+        .populate('usuario', '-password')
+        .exec();
+
+
+    res.json({
+        ok: true,
+        pagina,
+        post
+    });
+
+
+
+});
+
 postRoutes.post('/', [validaToken], (req: any, res: Response) => {
 
     const body = req.body;

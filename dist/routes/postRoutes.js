@@ -35,6 +35,24 @@ postRoutes.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
         post
     });
 }));
+//obtener POST paginado por usuario
+postRoutes.get('/obtener', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    let id = req.query.usuario || null;
+    let pagina = +req.query.pagina || 1;
+    let skip = pagina - 1;
+    skip = skip * 10;
+    const post = yield post_model_1.Post.find({ usuario: id })
+        .sort({ _id: -1 })
+        .skip(skip)
+        .limit(10)
+        .populate('usuario', '-password')
+        .exec();
+    res.json({
+        ok: true,
+        pagina,
+        post
+    });
+}));
 postRoutes.post('/', [autenticacion_1.validaToken], (req, res) => {
     const body = req.body;
     body.usuario = req.usuario._id;
